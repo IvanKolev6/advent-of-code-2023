@@ -8,13 +8,21 @@ import (
 	"strings"
 )
 
-func getTheGameID(line string) int{
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func getTheGameID(line string) (int, int){
 	gameReq := map[string]int{
 		"red" : 12,
 		"green" : 13,
 		"blue" : 14,
 	}
-
+	p1 := true
+	p2 := make(map[string]int)
 	games := strings.Split(line, ":")
 	game := strings.Split(games[1], ";")
 	for _, val := range game{
@@ -30,14 +38,23 @@ func getTheGameID(line string) int{
 		for pos := range cube_color{
 			value := gameReq[cube_color[pos]]
 			current_id, _ :=  strconv.Atoi(cube_id[pos])
+			p2[cube_color[pos]] = max(p2[cube_color[pos]], current_id)
 			if value < current_id{
-				return 0
+				p1 = false
 			}			
 		}
 
 	}
+
+	score := 1
+	for _, val := range p2 {
+		score *= val
+	}
 	game_id_int, _ :=  strconv.Atoi(strings.Split(games[0], " ")[1])
-	return game_id_int
+	if p1 == false{
+		return 0, score
+	}
+	return game_id_int, score
 }
 
 func main() {
@@ -59,12 +76,14 @@ func main() {
         panic(err)
     }
 	
-	sum := 0;
+	sum, sum2 := 0, 0;
 
 	for _, line := range lines {
-		id := getTheGameID(line)
+		id, score := getTheGameID(line)
         sum += id
+		sum2 += score
     }
 
 	fmt.Println(sum)
+	fmt.Println(sum2)
 }
